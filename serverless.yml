@@ -33,13 +33,13 @@ package:
     - src/**
 
 functions:
-  # exampleFunction:
-  #   handler: src/folder/file.method
-  #   events:
-  #     - http:
-  #         path: /example
-  #         method: get
-  #         cors: true
+  exampleFunction:
+    handler: src/Example.Example
+    events:
+      - http:
+          path: /example
+          method: get
+          cors: true
 resources:
   Resources:
     myDefaultRole:
