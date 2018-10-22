@@ -1,0 +1,22 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+.idea
+
+config.prod.yml
+config.staging.yml
+/src/private_key.pem
+/.vs
+/.webpack
+/dev-certs
+/85307dd5a3e1adbe255d9a043a262fb8.pem
+/155fcc4e5ca9ee0f49473c3ae8b95d9a.pem
+/.build
+
+offline\.env
+
+config\.dev\.yml

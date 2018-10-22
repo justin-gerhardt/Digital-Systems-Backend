@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- node
+cache:
+  directories:
+  - node_modules
+script:
+- travis_wait 45 sls deploy
+branches:
+  only:
+  - prod

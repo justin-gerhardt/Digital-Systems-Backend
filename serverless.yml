@@ -1,0 +1,57 @@
+service: DigitalSystemsBackend
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+provider:
+  name: aws
+  stage: ${env:TRAVIS_BRANCH, "dev"}
+  runtime: nodejs8.10
+  region: us-east-1
+  versionFunctions: false
+  role: myDefaultRole
+  memorySize: 128
+  timeout: 30
+  logRetentionInDays: 1
+  environment:
+    STAGE: ${self:provider.stage}
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+  serverless-offline:
+    host: "::"
+    useSeparateProcesses: false
+    #httpsProtocol: "dev-certs"
+    port: 8080
+ 
+package:
+  individually: false
+  exclude:
+    - package.json
+    - package-lock.json
+  include:
+    - src/**
+
+functions:
+  # exampleFunction:
+  #   handler: src/folder/file.method
+  #   events:
+  #     - http:
+  #         path: /example
+  #         method: get
+  #         cors: true
+resources:
+  Resources:
+    myDefaultRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AWSLambdaFullAccess

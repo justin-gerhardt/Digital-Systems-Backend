@@ -1,0 +1,35 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+    "max-line-length": [false],
+    "no-console": [false],
+    "no-implicit-dependencies": [true, "dev"],
+    "prefer-for-of": [false],
+    "member-ordering": [false],
+    "no-return-await": false,
+    "object-literal-key-quotes": [false],
+    "trailing-comma": [
+      true,
+      {
+        "multiline": {
+          "objects": "never",
+          "arrays": "never",
+          "functions": "never",
+          "typeLiterals": "never",
+          "imports": "never",
+          "exports": "never"
+        },
+        "singleline": {
+          "objects": "never",
+          "arrays": "never",
+          "functions": "never",
+          "typeLiterals": "never",
+          "imports": "never",
+          "exports": "never"
+        },
+        "esSpecCompliant": true
+      }
+    ]
+  },
+  "jsRules": {}
+}
