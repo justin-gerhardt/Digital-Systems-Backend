@@ -1,6 +1,6 @@
 
 export class Utils {
-  public static respond(code, message) {
+  public static respond(code: number, message: any) {
     if (typeof message === "string" || message instanceof String) {
       message = { Message: message };
     }
@@ -18,7 +18,7 @@ export class Utils {
     };
   }
 
-  public static respondRaw(code, message) {
+  public static respondRaw(code: number, message: any) {
     console.log(JSON.stringify({ ResponseCode: code, Message: message }));
     return {
       body: message,
