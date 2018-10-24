@@ -13,11 +13,19 @@ provider:
   timeout: 30
   logRetentionInDays: 1
   environment:
-    STAGE: ${self:provider.stage}
+    STAGE: ${self:custom.stage}
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
+  tables:
+    readCapacity: 1
+    writeCapacity: 1
+    lightTableName: ${self:service}-${self:custom.stage}-lightLevel
+    pressureTableName: ${self:service}-${self:custom.stage}-pressure
+    temperatureTableName: ${self:service}-${self:custom.stage}-temperature
+    humidityTableName: ${self:service}-${self:custom.stage}-humidity
+    rainTableName: ${self:service}-${self:custom.stage}-rain
   serverless-offline:
     host: "::"
     useSeparateProcesses: false
@@ -55,3 +63,68 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/AWSLambdaFullAccess
+    LightTable:
+         Type: AWS::DynamoDB::Table
+         Properties:
+           TableName: ${self:custom.tables.lightTableName}
+           AttributeDefinitions:
+           - AttributeName: ID
+             AttributeType: S
+           KeySchema:
+           - AttributeName: ID
+             KeyType: HASH
+           ProvisionedThroughput:
+             ReadCapacityUnits: ${self:custom.tables.readCapacity}
+             WriteCapacityUnits: ${self:custom.tables.writeCapacity}
+    PressureTable:
+         Type: AWS::DynamoDB::Table
+         Properties:
+           TableName: ${self:custom.tables.pressureTableName}
+           AttributeDefinitions:
+           - AttributeName: ID
+             AttributeType: S
+           KeySchema:
+           - AttributeName: ID
+             KeyType: HASH
+           ProvisionedThroughput:
+             ReadCapacityUnits: ${self:custom.tables.readCapacity}
+             WriteCapacityUnits: ${self:custom.tables.writeCapacity}
+    TemperatureTable:
+         Type: AWS::DynamoDB::Table
+         Properties:
+           TableName: ${self:custom.tables.temperatureTableName}
+           AttributeDefinitions:
+           - AttributeName: ID
+             AttributeType: S
+           KeySchema:
+           - AttributeName: ID
+             KeyType: HASH
+           ProvisionedThroughput:
+             ReadCapacityUnits: ${self:custom.tables.readCapacity}
+             WriteCapacityUnits: ${self:custom.tables.writeCapacity}
+    HumidityTable:
+         Type: AWS::DynamoDB::Table
+         Properties:
+           TableName: ${self:custom.tables.humidityTableName}
+           AttributeDefinitions:
+           - AttributeName: ID
+             AttributeType: S
+           KeySchema:
+           - AttributeName: ID
+             KeyType: HASH
+           ProvisionedThroughput:
+             ReadCapacityUnits: ${self:custom.tables.readCapacity}
+             WriteCapacityUnits: ${self:custom.tables.writeCapacity}
+    RainTable:
+         Type: AWS::DynamoDB::Table
+         Properties:
+           TableName: ${self:custom.tables.rainTableName}
+           AttributeDefinitions:
+           - AttributeName: ID
+             AttributeType: S
+           KeySchema:
+           - AttributeName: ID
+             KeyType: HASH
+           ProvisionedThroughput:
+             ReadCapacityUnits: ${self:custom.tables.readCapacity}
+             WriteCapacityUnits: ${self:custom.tables.writeCapacity}
