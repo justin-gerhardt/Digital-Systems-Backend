@@ -4,5 +4,5 @@ node_js:
 script:
 - travis_wait 45 sls deploy
 branches:
-  only:
-  - prod
+  except:
+  - master
