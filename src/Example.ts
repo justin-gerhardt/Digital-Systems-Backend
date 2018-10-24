@@ -5,5 +5,5 @@ import { Utils } from "./Utils";
 import "source-map-support/register";
 
 export async function Example(event: AWSLambda.APIGatewayEvent, context: AWSLambda.Context) {
-  return Utils.respond(HttpStatus.OK,"Hello World!");
+  return Utils.respond(HttpStatus.OK, "Hello World!");
 }
