@@ -46,12 +46,12 @@ package:
     - src/**
 
 functions:
-  exampleFunction:
-    handler: src/Example.Example
+  PostSensorData:
+    handler: src/SensorData.AddDataHandler
     events:
       - http:
-          path: /example
-          method: get
+          path: /device/{deviceID}/{sensor}
+          method: post
           cors: true
 resources:
   Resources:
@@ -73,11 +73,15 @@ resources:
          Properties:
            TableName: ${self:custom.tables.lightTableName}
            AttributeDefinitions:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              AttributeType: S
+           - AttributeName: Timestamp
+             AttributeType: N
            KeySchema:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              KeyType: HASH
+           - AttributeName: Timestamp
+             KeyType: RANGE
            ProvisionedThroughput:
              ReadCapacityUnits: ${self:custom.tables.readCapacity}
              WriteCapacityUnits: ${self:custom.tables.writeCapacity}
@@ -86,11 +90,15 @@ resources:
          Properties:
            TableName: ${self:custom.tables.pressureTableName}
            AttributeDefinitions:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              AttributeType: S
+           - AttributeName: Timestamp
+             AttributeType: N
            KeySchema:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              KeyType: HASH
+           - AttributeName: Timestamp
+             KeyType: RANGE
            ProvisionedThroughput:
              ReadCapacityUnits: ${self:custom.tables.readCapacity}
              WriteCapacityUnits: ${self:custom.tables.writeCapacity}
@@ -99,11 +107,15 @@ resources:
          Properties:
            TableName: ${self:custom.tables.temperatureTableName}
            AttributeDefinitions:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              AttributeType: S
+           - AttributeName: Timestamp
+             AttributeType: N
            KeySchema:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              KeyType: HASH
+           - AttributeName: Timestamp
+             KeyType: RANGE
            ProvisionedThroughput:
              ReadCapacityUnits: ${self:custom.tables.readCapacity}
              WriteCapacityUnits: ${self:custom.tables.writeCapacity}
@@ -112,11 +124,15 @@ resources:
          Properties:
            TableName: ${self:custom.tables.humidityTableName}
            AttributeDefinitions:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              AttributeType: S
+           - AttributeName: Timestamp
+             AttributeType: N
            KeySchema:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              KeyType: HASH
+           - AttributeName: Timestamp
+             KeyType: RANGE
            ProvisionedThroughput:
              ReadCapacityUnits: ${self:custom.tables.readCapacity}
              WriteCapacityUnits: ${self:custom.tables.writeCapacity}
@@ -125,11 +141,15 @@ resources:
          Properties:
            TableName: ${self:custom.tables.rainTableName}
            AttributeDefinitions:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              AttributeType: S
+           - AttributeName: Timestamp
+             AttributeType: N
            KeySchema:
-           - AttributeName: ID
+           - AttributeName: Device_ID
              KeyType: HASH
+           - AttributeName: Timestamp
+             KeyType: RANGE
            ProvisionedThroughput:
              ReadCapacityUnits: ${self:custom.tables.readCapacity}
              WriteCapacityUnits: ${self:custom.tables.writeCapacity}
