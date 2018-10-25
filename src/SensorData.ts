@@ -10,8 +10,16 @@ import { PressureData } from "./entities/PressureData";
 import { RainData } from "./entities/RainData";
 import { TemperatureData } from "./entities/TemperatureData";
 
+function isUUIDv4(value: string) {
+  const v4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return v4Regex.test(value);
+}
+
 async function AddData(event: AWSLambda.APIGatewayEvent) {
   const deviceID = event.pathParameters!.deviceID;
+  if (!isUUIDv4(deviceID)) {
+    return Utils.respond(HttpStatus.BAD_REQUEST, "Device id is invalid");
+  }
   const sensor = event.pathParameters!.sensor;
   if (!event.body) {
     return Utils.respond(HttpStatus.BAD_REQUEST, "Post request must have a body");
