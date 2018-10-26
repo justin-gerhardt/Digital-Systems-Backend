@@ -46,6 +46,13 @@ package:
     - src/**
 
 functions:
+  GetSensorStatus:
+    handler: src/SensorData.StatusHandler
+    events:
+      - http:
+          path: /device/{deviceID}/status
+          method: get
+          cors: true
   PostSensorData:
     handler: src/SensorData.AddDataHandler
     events:

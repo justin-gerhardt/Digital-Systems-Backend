@@ -103,10 +103,24 @@ export async function GetDataHandler(event: AWSLambda.APIGatewayEvent, context: 
       return Utils.respond(HttpStatus.BAD_REQUEST, "limitTime must be greater than or equal to zero");
     }
   }
-  return await GetData(deviceID, sensor, limitCount, limitTime);
+
+  let results = await GetData(deviceID, sensor);
+  if (results == null) {
+    return Utils.respond(HttpStatus.NOT_FOUND, "Sensor value is invalid");
+  }
+  if (limitTime !== null) {
+    const now = new Date().getTime() / 1000;
+    const after = now - limitTime;
+    results = results.filter((x) => x.time >= after);
+  }
+  results.sort((a, b) => b.time - a.time);
+  if (limitCount !== null) {
+    results = results.slice(0, limitCount);
+  }
+  return Utils.respond(HttpStatus.OK, results);
 }
 
-export async function GetData(deviceID: string, sensor: string, limitCount: number | null, limitTime: number | null) {
+async function GetData(deviceID: string, sensor: string) {
   let results: Array<{ time: number }> = [];
   switch (sensor) {
     case "rain": {
@@ -150,17 +164,40 @@ export async function GetData(deviceID: string, sensor: string, limitCount: numb
       break;
     }
     default: {
-      return Utils.respond(HttpStatus.NOT_FOUND, "Sensor value is invalid");
+      return null;
     }
   }
-  if (limitTime !== null) {
-    const now = new Date().getTime() / 1000;
-    const after = now - limitTime;
-    results = results.filter((x) => x.time >= after);
+  return results;
+}
+
+export async function StatusHandler(event: AWSLambda.APIGatewayEvent, context: AWSLambda.Context) {
+  const deviceID = event.pathParameters!.deviceID;
+  if (!isUUIDv4(deviceID)) {
+    return Utils.respond(HttpStatus.BAD_REQUEST, "Device id is invalid");
   }
-  results.sort((a, b) => b.time - a.time);
-  if (limitCount !== null) {
-    results = results.slice(0, limitCount);
+
+  const sensors = ["rain", "humidity", "pressure", "lightLevel", "temperature"];
+  const results = await Promise.all(sensors.map((sensor) => {
+    return GetData(deviceID, sensor).then((x) => {
+      return x!.sort((a, b) => b.time - a.time)[0] || null;
+    });
+  }));
+
+  if (results.every((x) => x === null)) {
+    return Utils.respond(HttpStatus.NOT_FOUND, { ErrorMessage: "That device ID has never submitted any data" });
   }
-  return Utils.respond(HttpStatus.OK, results);
+
+  let maxTime = 0;
+  for (const result of results) {
+    if (result !== null && result.time > maxTime) {
+      maxTime = result.time;
+    }
+  }
+
+  const output = { MostRecentUpdate: maxTime };
+  for (let i = 0; i < sensors.length; i++) {
+    output[sensors[i]] = results[i];
+  }
+
+  return Utils.respond(HttpStatus.OK, output);
 }
