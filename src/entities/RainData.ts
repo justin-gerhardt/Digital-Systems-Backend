@@ -22,11 +22,11 @@ export class RainData extends Table {
     }
 
     @Decorator.Attribute({ name: "Device_ID" })
-    public DeviceID: string | undefined;
+    public DeviceID!: string;
 
     @Decorator.Attribute({ name: "Timestamp" })
-    public Timestamp: number | undefined;
+    public Timestamp!: number;
 
     @Decorator.Attribute({ name: "Value" })
-    public value: boolean | undefined;
+    public value!: boolean;
 }

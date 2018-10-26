@@ -15,21 +15,7 @@ function isUUIDv4(value: string) {
   return v4Regex.test(value);
 }
 
-async function AddData(event: AWSLambda.APIGatewayEvent) {
-  const deviceID = event.pathParameters!.deviceID;
-  if (!isUUIDv4(deviceID)) {
-    return Utils.respond(HttpStatus.BAD_REQUEST, "Device id is invalid");
-  }
-  const sensor = event.pathParameters!.sensor;
-  if (!event.body) {
-    return Utils.respond(HttpStatus.BAD_REQUEST, "Post request must have a body");
-  }
-  let body: any;
-  try {
-    body = JSON.parse(event.body);
-  } catch (e) {
-    return Utils.respond(HttpStatus.BAD_REQUEST, "Post body must be json");
-  }
+async function AddData(deviceID: string, sensor: string, body: any) {
   switch (sensor) {
     case "rain": {
       if (body.raining === null || typeof body.raining !== "boolean") {
@@ -74,8 +60,22 @@ async function AddData(event: AWSLambda.APIGatewayEvent) {
 }
 
 export async function AddDataHandler(event: AWSLambda.APIGatewayEvent, context: AWSLambda.Context) {
+  const deviceID = event.pathParameters!.deviceID;
+  if (!isUUIDv4(deviceID)) {
+    return Utils.respond(HttpStatus.BAD_REQUEST, "Device id is invalid");
+  }
+  if (!event.body) {
+    return Utils.respond(HttpStatus.BAD_REQUEST, "Post request must have a body");
+  }
+  let body: any;
   try {
-    return await AddData(event);
+    body = JSON.parse(event.body);
+  } catch (e) {
+    return Utils.respond(HttpStatus.BAD_REQUEST, "Post body must be json");
+  }
+  const sensor = event.pathParameters!.sensor;
+  try {
+    return await AddData(deviceID, sensor, body);
   } catch (e) {
     if (e instanceof RangeError) {
       return Utils.respond(HttpStatus.BAD_REQUEST, { Error: "Data out of range", Message: e.message });
@@ -83,4 +83,84 @@ export async function AddDataHandler(event: AWSLambda.APIGatewayEvent, context: 
       throw e;
     }
   }
+}
+
+export async function GetDataHandler(event: AWSLambda.APIGatewayEvent, context: AWSLambda.Context) {
+  const deviceID = event.pathParameters!.deviceID;
+  if (!isUUIDv4(deviceID)) {
+    return Utils.respond(HttpStatus.BAD_REQUEST, "Device id is invalid");
+  }
+  const sensor = event.pathParameters!.sensor;
+  let limitCount: number | null = null;
+  let limitTime: number | null = null;
+  if (event.queryStringParameters) {
+    limitCount = parseInt(event.queryStringParameters!.limitCount, 10) || null;
+    if (limitCount !== null && limitCount < 1) {
+      return Utils.respond(HttpStatus.BAD_REQUEST, "limitCount must be at least one");
+    }
+    limitTime = parseInt(event.queryStringParameters!.limitTime, 10) || null;
+    if (limitTime !== null && limitTime < 0) {
+      return Utils.respond(HttpStatus.BAD_REQUEST, "limitTime must be greater than or equal to zero");
+    }
+  }
+  return await GetData(deviceID, sensor, limitCount, limitTime);
+}
+
+export async function GetData(deviceID: string, sensor: string, limitCount: number | null, limitTime: number | null) {
+  let results: Array<{ time: number }> = [];
+  switch (sensor) {
+    case "rain": {
+      const dbResponse = await RainData.primaryKey.query({ hash: deviceID });
+      results = dbResponse.records.map((x) => ({
+        raining: x.value,
+        time: Math.floor(x.Timestamp / 1000)
+      }));
+      break;
+    }
+    case "humidity": {
+      const dbResponse = await HumidityData.primaryKey.query({ hash: deviceID });
+      results = dbResponse.records.map((x) => ({
+        humidity: x.value,
+        time: Math.floor(x.Timestamp / 1000)
+      }));
+      break;
+    }
+    case "lightLevel": {
+      const dbResponse = await LightLevelData.primaryKey.query({ hash: deviceID });
+      results = dbResponse.records.map((x) => ({
+        lightLevel: x.value,
+        time: Math.floor(x.Timestamp / 1000)
+      }));
+      break;
+    }
+    case "pressure": {
+      const dbResponse = await PressureData.primaryKey.query({ hash: deviceID });
+      results = dbResponse.records.map((x) => ({
+        pressure: x.value,
+        time: Math.floor(x.Timestamp / 1000)
+      }));
+      break;
+    }
+    case "temperature": {
+      const dbResponse = await TemperatureData.primaryKey.query({ hash: deviceID });
+      results = dbResponse.records.map((x) => ({
+        temperature: x.value,
+        time: Math.floor(x.Timestamp / 1000)
+      }));
+      break;
+    }
+    default: {
+      return Utils.respond(HttpStatus.NOT_FOUND, "Sensor value is invalid");
+    }
+  }
+  if (limitTime !== null) {
+    const now = new Date().getTime() / 1000;
+    const after = now - limitTime;
+    results = results.filter((x) => x.time >= after);
+  }
+  results.sort((a, b) => b.time - a.time);
+  if (limitCount !== null) {
+    results = results.slice(0, limitCount);
+  }
+  return Utils.respond(HttpStatus.OK, results);
 }

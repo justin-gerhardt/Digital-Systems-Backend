@@ -29,11 +29,11 @@ export class HumidityData extends Table {
     }
 
     @Decorator.Attribute({ name: "Device_ID" })
-    public DeviceID: string | undefined;
+    public DeviceID!: string;
 
     @Decorator.Attribute({ name: "Timestamp" })
-    public Timestamp: number | undefined;
+    public Timestamp!: number;
 
     @Decorator.Attribute({ name: "Value" })
-    public value: number | undefined;
+    public value!: number;
 }

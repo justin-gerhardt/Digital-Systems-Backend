@@ -53,6 +53,13 @@ functions:
           path: /device/{deviceID}/{sensor}
           method: post
           cors: true
+  GetSensorData:
+    handler: src/SensorData.GetDataHandler
+    events:
+      - http:
+          path: /device/{deviceID}/{sensor}
+          method: get
+          cors: true
 resources:
   Resources:
     myDefaultRole:
