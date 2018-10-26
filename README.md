@@ -6,6 +6,8 @@
 
 [The api base url that all requests are relative to.](https://3kevnmi0x4.execute-api.us-east-1.amazonaws.com/prod/)
 
+The ID number we are using for the production device is `51080158-dd99-4df1-b7f0-7cfe868a5150` for testing purposes you may submit data for any valid uuid and it will work.
+
 ## Development
 
 If you are simply using this api you should only need the Api docs and base url above.
