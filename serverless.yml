@@ -1,6 +1,7 @@
 service: DigitalSystemsBackend
 plugins:
   - serverless-plugin-typescript
+  - serverless-dynamodb-local
   - serverless-offline
 provider:
   name: aws
@@ -23,6 +24,10 @@ provider:
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
+  dynamodb:
+    start:
+      port: 8000
+      migrate: true
   tables:
     readCapacity: 1
     writeCapacity: 1

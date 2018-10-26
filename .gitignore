@@ -20,3 +20,5 @@ config.staging.yml
 offline\.env
 
 config\.dev\.yml
+
+\.dynamodb/
