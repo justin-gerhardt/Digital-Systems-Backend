@@ -16,7 +16,8 @@ This section is for modifying the api.
 1. Clone this repo
 2. Install node.js (if you haven't already)
 3. open a terminal and run npm install in the repo folder
-4. run serverless dynamodb install
+4. if it's not already in there add `./node_modules/.bin/` to your path (or preface all serverless commands with it)
+5. run serverless dynamodb install
 
 If you are planning on adding new api calls you will have to add the details in the api documentation above and add the relevent function to the serverless.yml file. See the existing functions for details.
 
